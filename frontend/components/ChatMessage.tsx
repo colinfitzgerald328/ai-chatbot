@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { Avatar, Box, Text, Flex, useColorModeValue, Spinner } from '@chakra-ui/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Avatar, Box, Text, Flex, useColorModeValue, Spinner, IconButton, useToast } from '@chakra-ui/react';
 import { keyframes, css } from '@emotion/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow, oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { Message } from '../types/chat';
+import { CopyIcon, CheckIcon } from '@chakra-ui/icons';
 
 // Define fade-in animation
 const fadeIn = keyframes`
@@ -28,6 +29,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
   const { role, content, timestamp, isThinking } = message;
   const prevContentRef = useRef('');
   const isStreaming = isLatest && prevContentRef.current !== content && !isThinking;
+  
+  // Add state for tracking which code block is being copied
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const toast = useToast();
+  const codeBlockRefs = useRef<Array<HTMLDivElement | null>>([]);
   
   // Update the ref when content changes
   useEffect(() => {
@@ -132,9 +138,52 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
                     <Box 
                       my={4} 
                       borderRadius="md" 
-                      overflow="auto" 
+                      overflow="hidden" 
                       maxW="100%"
+                      position="relative"
+                      ref={(el) => {
+                        // Store reference to this code block
+                        const index = codeBlockRefs.current.length;
+                        codeBlockRefs.current[index] = el;
+                      }}
                     >
+                      <IconButton
+                        aria-label="Copy code"
+                        icon={copiedIndex === codeBlockRefs.current.length - 1 ? <CheckIcon /> : <CopyIcon />}
+                        size="sm"
+                        position="absolute"
+                        top={2}
+                        right={2}
+                        zIndex={1}
+                        onClick={() => {
+                          const index = codeBlockRefs.current.length - 1;
+                          const codeText = String(children).replace(/\n$/, '');
+                          navigator.clipboard.writeText(codeText)
+                            .then(() => {
+                              setCopiedIndex(index);
+                              toast({
+                                title: "Code copied",
+                                status: "success",
+                                duration: 2000,
+                                isClosable: true,
+                              });
+                              setTimeout(() => setCopiedIndex(null), 2000);
+                            })
+                            .catch(err => {
+                              toast({
+                                title: "Failed to copy",
+                                description: err.message,
+                                status: "error",
+                                duration: 3000,
+                                isClosable: true,
+                              });
+                            });
+                        }}
+                        colorScheme="gray"
+                        variant="ghost"
+                        opacity={0.7}
+                        _hover={{ opacity: 1 }}
+                      />
                       <SyntaxHighlighter
                         style={codeStyle}
                         language={match[1]}
@@ -172,13 +221,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
                   return <Text as="h3" fontSize="md" fontWeight="bold" my={2} overflowWrap="break-word">{children}</Text>;
                 },
                 ul({children}) {
-                  return <Box as="ul" pl={5} my={3} overflowX="auto" width="100%">{children}</Box>;
+                  return <Box as="ul" pl={6} my={3} overflowX="auto" width="100%" listStylePosition="outside" listStyleType="disc" css={{ '& > li': { marginLeft: '1em' } }}>{children}</Box>;
                 },
                 ol({children}) {
-                  return <Box as="ol" pl={5} my={3} overflowX="auto" width="100%">{children}</Box>;
+                  return <Box as="ol" pl={6} my={3} overflowX="auto" width="100%" listStylePosition="outside" listStyleType="decimal" css={{ '& > li': { marginLeft: '1em' } }}>{children}</Box>;
                 },
                 li({children}) {
-                  return <Box as="li" mb={1} overflowWrap="break-word">{children}</Box>;
+                  return <Box as="li" mb={2} ml={0} overflowWrap="break-word" display="list-item" sx={{ '::marker': { color: useColorModeValue('gray.600', 'gray.400') } }}>{children}</Box>;
                 },
                 blockquote({children}) {
                   return (
