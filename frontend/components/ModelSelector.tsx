@@ -25,9 +25,9 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
   
   const getModelLabel = (model: ModelType): string => {
     switch (model) {
-      case 'claude': return 'Claude';
-      case 'gpt': return 'GPT';
-      case 'gemini': return 'Gemini';
+      case 'claude': return 'Claude 3-7 Sonnet';
+      case 'gpt': return 'GPT-4o';
+      case 'gemini': return 'Gemini 2.5 Pro';
     }
   };
 

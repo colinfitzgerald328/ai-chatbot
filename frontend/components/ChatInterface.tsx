@@ -462,7 +462,6 @@ const ChatInterface: React.FC = () => {
           <ModelSelector 
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
-            mr={2}
           />
           <Tooltip label="Clear chat history" placement="bottom">
             <IconButton
