@@ -1,8 +1,8 @@
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import ChatInterface from '../components/ChatInterface';
-import theme from '../theme';
+import type { NextPage } from "next";
+import Head from "next/head";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import ChatInterface from "../components/ChatInterface";
+import theme from "../theme";
 
 const Home: NextPage = () => {
   return (
@@ -21,4 +21,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home; 
+export default Home;

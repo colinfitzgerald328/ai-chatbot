@@ -1,11 +1,11 @@
 import { ModelType } from "../components/ModelSelector";
 
 export interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: number;
   isThinking?: boolean;
-  modelName?: ModelType
+  modelName?: ModelType;
 }
 
 export interface ChatRequest {
@@ -14,4 +14,4 @@ export interface ChatRequest {
     content: string;
   }[];
   system_prompt?: string;
-} 
+}
