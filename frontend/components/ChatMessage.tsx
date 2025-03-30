@@ -109,15 +109,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     >
       <Avatar
         size="sm"
-        name={
-          role === "user"
-            ? "You"
-            : message.modelName
-        }
+        name={role === "user" ? "You" : message.modelName}
         bg={
           role === "user"
             ? "blue.500"
-            : message.modelName === 'Claude 3-7 Sonnet'
+            : message.modelName === "Claude 3-7 Sonnet"
               ? "purple.500"
               : message.modelName === "GPT 4o"
                 ? "green.500"
@@ -153,9 +149,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         {isThinking ? (
           <Flex align="center" opacity={0.8}>
             <Spinner size="xs" mr={2} color="purple.500" />
-            <Text color={textColor}>
-              {message.modelName} is thinking...
-            </Text>
+            <Text color={textColor}>{message.modelName} is thinking...</Text>
           </Flex>
         ) : (
           <Box mb={2} overflowWrap="break-word" css={cursorStyle} width="100%">
