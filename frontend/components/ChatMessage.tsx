@@ -126,7 +126,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                code({node, inline, className, children, ...props}) {
+                code({node, inline, className, children, ...props}: any) {
                   const match = /language-(\w+)/.exec(className || '');
                   return !inline && match ? (
                     <Box 
