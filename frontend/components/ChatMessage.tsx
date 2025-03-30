@@ -112,22 +112,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         name={
           role === "user"
             ? "You"
-            : message.modelName === "claude"
-              ? "Claude"
-              : message.modelName === "gpt"
-                ? "GPT"
-                : message.modelName === "gemini"
-                  ? "Gemini"
-                  : "Assistant"
+            : message.modelName
         }
         bg={
           role === "user"
             ? "blue.500"
-            : message.modelName === "claude"
+            : message.modelName === 'Claude 3-7 Sonnet'
               ? "purple.500"
-              : message.modelName === "gpt"
+              : message.modelName === "GPT 4o"
                 ? "green.500"
-                : message.modelName === "gemini"
+                : message.modelName === "Gemini 2.5 Pro"
                   ? "teal.500"
                   : "purple.500"
         }
@@ -160,14 +154,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <Flex align="center" opacity={0.8}>
             <Spinner size="xs" mr={2} color="purple.500" />
             <Text color={textColor}>
-              {message.modelName === "claude"
-                ? "Claude 3-7 Sonnet"
-                : message.modelName === "gpt"
-                  ? "GPT 4o"
-                  : message.modelName === "gemini"
-                    ? "Gemini 2.5-Pro"
-                    : "Assistant"}{" "}
-              is thinking...
+              {message.modelName} is thinking...
             </Text>
           </Flex>
         ) : (

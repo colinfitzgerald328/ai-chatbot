@@ -673,9 +673,9 @@ const ChatInterface: React.FC = () => {
 
       <Text fontSize="xs" textAlign="center" mt={2} color="gray.500">
         Powered by{" "}
-        {selectedModel === "claude"
+        {selectedModel === "Claude 3-7 Sonnet"
           ? "Claude 3-7 Sonnet"
-          : selectedModel === "gpt"
+          : selectedModel === "GPT 4o"
             ? "GPT 4o"
             : "Gemini 2.5-Pro"}{" "}
         • Not a substitute for professional medical advice
