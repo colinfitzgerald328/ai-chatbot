@@ -28,6 +28,7 @@ import { SunIcon, MoonIcon, DeleteIcon, ArrowUpIcon, SettingsIcon } from '@chakr
 import ChatMessage from './ChatMessage';
 import { Message } from '../types/chat';
 import { saveChatHistory, loadChatHistory, clearChatHistory } from '../utils/chatStorage';
+import ModelSelector, { ModelType } from './ModelSelector';
 
 // API endpoint configuration
 const API_URL = process.env.NEXT_PUBLIC_CHAT_API_URL;
@@ -66,6 +67,9 @@ const ChatInterface: React.FC = () => {
   // Responsive adjustments
   const containerMaxW = useBreakpointValue({ base: '100%', md: 'container.md', lg: 'container.lg' });
   const headingSize = useBreakpointValue({ base: 'lg', md: 'xl' });
+
+  // Add this to the state declarations (around line 46-50)
+  const [selectedModel, setSelectedModel] = useState<ModelType>('claude');
 
   // Create a debounced update function
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -269,12 +273,13 @@ const ChatInterface: React.FC = () => {
     // Force scroll to bottom and enable auto-scrolling
     forceScrollToBottom();
     
-    // Add a placeholder "Claude is thinking..." message
+    // Add a placeholder "Model is thinking..." message
     const thinkingMessage: Message = {
       role: 'assistant',
       content: '',
       timestamp: Date.now(),
-      isThinking: true
+      isThinking: true,
+      modelName: selectedModel  // Add the model name to the thinking message
     };
     
     // Add the thinking message
@@ -299,6 +304,7 @@ const ChatInterface: React.FC = () => {
         },
         body: JSON.stringify({
           messages: apiMessages,
+          model: selectedModel, // Include selected model in the request
         }),
       });
 
@@ -453,6 +459,11 @@ const ChatInterface: React.FC = () => {
           </Flex>
         </Heading>
         <Flex>
+          <ModelSelector 
+            selectedModel={selectedModel}
+            onModelChange={setSelectedModel}
+            mr={2}
+          />
           <Tooltip label="Clear chat history" placement="bottom">
             <IconButton
               aria-label="Clear chat"
@@ -613,7 +624,9 @@ const ChatInterface: React.FC = () => {
       </Box>
       
       <Text fontSize="xs" textAlign="center" mt={2} color="gray.500">
-        Powered by Claude 3.5 Sonnet • Not a substitute for professional medical advice
+        Powered by {selectedModel === 'claude' ? 'Claude 3-7 Sonnet' : 
+                    selectedModel === 'gpt' ? 'GPT 4o' : 
+                    'Gemini 2.5-Pro'} • Not a substitute for professional medical advice
       </Text>
     </Container>
   );

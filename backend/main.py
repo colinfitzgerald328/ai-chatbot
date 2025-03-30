@@ -5,8 +5,12 @@ from typing import List, Optional
 import anthropic
 import os
 import asyncio
+import json
+import httpx
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
+from openai import AsyncOpenAI
+from google import genai
 
 # Load environment variables
 load_dotenv()
@@ -25,6 +29,13 @@ app.add_middleware(
 # Initialize Anthropic client
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+# Add these environment variables to your .env file
+# OPENAI_API_KEY=your_openai_key
+# GEMINI_API_KEY=your_gemini_key
+
+# Add this near the top of the file, after imports
+MEDIA_TYPE_TEXT_PLAIN = "text/plain"
+
 
 class Message(BaseModel):
     role: str
@@ -33,6 +44,7 @@ class Message(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: List[Message]
+    model: str = "claude"  # Default to Claude
 
 
 SYSTEM_PROMPT = """You are a medical information assistant designed to provide general health information to users. Your primary goals are to:
@@ -55,23 +67,20 @@ When uncertain about specific medical information, acknowledge limitations rathe
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
+        model = request.model.lower()
         anthropic_messages = [
             {"role": msg.role, "content": msg.content} for msg in request.messages
         ]
 
-        async def generate_response():
-            with client.messages.stream(
-                model="claude-3-5-sonnet-20240620",
-                max_tokens=2000,
-                system=SYSTEM_PROMPT,
-                messages=anthropic_messages,
-            ) as stream:
-                for text in stream.text_stream:
-                    yield text
-                    # Add a small delay to avoid overwhelming the client
-                    await asyncio.sleep(0.01)
-
-        return StreamingResponse(generate_response(), media_type="text/plain")
+        if model == "claude":
+            return await handle_claude_stream(anthropic_messages)
+        elif model == "gpt":
+            return await handle_gpt_stream(anthropic_messages)
+        elif model == "gemini":
+            return await handle_gemini_stream(anthropic_messages)
+        else:
+            # Default to Claude if model is not recognized
+            return await handle_claude_stream(anthropic_messages)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -80,6 +89,83 @@ async def chat(request: ChatRequest):
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
+
+
+# Claude streaming handler
+async def handle_claude_stream(messages):
+    async def generate_response():
+        with client.messages.stream(
+            model="claude-3-7-sonnet-20250219",
+            max_tokens=2000,
+            system=SYSTEM_PROMPT,
+            messages=messages,
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
+                # Add a small delay to avoid overwhelming the client
+                await asyncio.sleep(0.01)
+
+    return StreamingResponse(generate_response(), media_type=MEDIA_TYPE_TEXT_PLAIN)
+
+
+# GPT streaming handler
+async def handle_gpt_stream(messages):
+    async def generate_response():
+        # Initialize OpenAI client
+        client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        # Format messages for OpenAI
+        openai_messages = [
+            {"role": msg["role"], "content": msg["content"]} for msg in messages
+        ]
+
+        # Add system message for GPT
+        openai_messages.insert(0, {"role": "system", "content": SYSTEM_PROMPT})
+
+        # Create streaming response
+        stream = await client.chat.completions.create(
+            model="gpt-4o", messages=openai_messages, stream=True
+        )
+
+        # Process the stream
+        async for chunk in stream:
+            if chunk.choices[0].delta.content is not None:
+                yield chunk.choices[0].delta.content
+
+    return StreamingResponse(generate_response(), media_type=MEDIA_TYPE_TEXT_PLAIN)
+
+
+# Gemini streaming handler
+async def handle_gemini_stream(messages):
+    async def generate_response():
+        # Initialize Gemini client
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+        # Format messages for Gemini API
+        gemini_messages = []
+        for msg in messages:
+            role = "user" if msg["role"] == "user" else "model"
+            content = msg["content"]
+            gemini_messages.append({"role": role, "parts": [{"text": content}]})
+
+        # Add system prompt as a prefix to the first user message
+        if gemini_messages and gemini_messages[0]["role"] == "user":
+            gemini_messages[0]["parts"][0]["text"] = (
+                f"System instruction: {SYSTEM_PROMPT}\n\n"
+                f"User: {gemini_messages[0]['parts'][0]['text']}"
+            )
+
+        # Create streaming response
+        response = client.models.generate_content_stream(
+            model="gemini-2.5-pro-exp-03-25", contents=gemini_messages
+        )
+
+        # Process the stream
+        for chunk in response:
+            if chunk.text:
+                yield chunk.text
+
+    return StreamingResponse(generate_response(), media_type=MEDIA_TYPE_TEXT_PLAIN)
 
 
 if __name__ == "__main__":

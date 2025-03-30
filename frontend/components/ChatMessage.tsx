@@ -90,8 +90,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
     >
       <Avatar 
         size="sm" 
-        name={role === 'user' ? 'You' : 'Claude'} 
-        bg={role === 'user' ? 'blue.500' : 'purple.500'} 
+        name={role === 'user' ? 'You' : 
+              message.modelName === 'claude' ? 'Claude' : 
+              message.modelName === 'gpt' ? 'GPT' : 
+              message.modelName === 'gemini' ? 'Gemini' : 
+              'Assistant'} 
+        bg={role === 'user' ? 'blue.500' : 
+            message.modelName === 'claude' ? 'purple.500' : 
+            message.modelName === 'gpt' ? 'green.500' : 
+            message.modelName === 'gemini' ? 'teal.500' : 
+            'purple.500'} 
         mr={3} 
         boxShadow="sm"
         flexShrink={0}
@@ -120,7 +128,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isLatest = false }) 
         {isThinking ? (
           <Flex align="center" opacity={0.8}>
             <Spinner size="xs" mr={2} color="purple.500" />
-            <Text color={textColor}>Claude is thinking...</Text>
+            <Text color={textColor}>
+              {message.modelName === 'claude' ? 'Claude 3-7 Sonnet' : 
+               message.modelName === 'gpt' ? 'GPT 4o' : 
+               message.modelName === 'gemini' ? 'Gemini 2.5-Pro' : 
+               'Assistant'} is thinking...
+            </Text>
           </Flex>
         ) : (
           <Box 
