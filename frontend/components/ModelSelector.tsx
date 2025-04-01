@@ -1,71 +1,40 @@
-import React from "react";
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  useColorModeValue,
-  Text,
-  Flex,
-} from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-
-export type ModelType = "Claude 3-7 Sonnet" | "GPT 4o" | "Gemini 2.5 Pro";
+import React, { memo } from 'react';
+import { Select, Box } from '@chakra-ui/react';
 
 interface ModelSelectorProps {
-  selectedModel: ModelType;
-  onModelChange: (model: ModelType) => void;
+  selectedModel: string;
+  onModelChange: (model: string) => void;
+  disabled?: boolean;
 }
 
-const ModelSelector: React.FC<ModelSelectorProps> = ({
-  selectedModel,
-  onModelChange,
+const ModelSelector: React.FC<ModelSelectorProps> = memo(({ 
+  selectedModel, 
+  onModelChange, 
+  disabled = false 
 }) => {
-  const menuBg = useColorModeValue("white", "gray.800");
-  const menuBorder = useColorModeValue("gray.200", "gray.700");
-
-  const getModelLabel = (model: ModelType): string => {
-    switch (model) {
-      case "Claude 3-7 Sonnet":
-        return "Claude 3-7 Sonnet";
-      case "GPT 4o":
-        return "GPT 4o";
-      case "Gemini 2.5 Pro":
-        return "Gemini 2.5 Pro";
-    }
-  };
-
   return (
-    <Menu>
-      <MenuButton
-        as={Button}
-        rightIcon={<ChevronDownIcon />}
-        size="sm"
-        variant="outline"
-        borderColor={useColorModeValue("gray.300", "gray.600")}
-        _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
-      >
-        <Flex alignItems="center">
-          <Text>{getModelLabel(selectedModel)}</Text>
-        </Flex>
-      </MenuButton>
-      <MenuList
-        zIndex={1500}
-        bg={menuBg}
-        borderColor={menuBorder}
-        boxShadow="md"
-      >
-        <MenuItem onClick={() => onModelChange("Claude 3-7 Sonnet")}>
-          Claude 3-7 Sonnet
-        </MenuItem>
-        <MenuItem onClick={() => onModelChange("GPT 4o")}>GPT 4o</MenuItem>
-        <MenuItem onClick={() => onModelChange("Gemini 2.5 Pro")}>
-          Gemini 2.5 Pro
-        </MenuItem>
-      </MenuList>
-    </Menu>
+    <Select
+      value={selectedModel}
+      onChange={(e) => onModelChange(e.target.value)}
+      disabled={disabled}
+      size="sm"
+      bg="white"
+      color="gray.700"
+      fontWeight="medium"
+      borderColor="gray.300"
+      width="auto"
+      minWidth="120px"
+      borderRadius="md"
+      _hover={{ borderColor: 'purple.300' }}
+      _focus={{ borderColor: 'purple.500', boxShadow: '0 0 0 1px var(--chakra-colors-purple-500)' }}
+    >
+      <option value="claude" style={{color: 'black'}}>Claude</option>
+      <option value="gpt" style={{color: 'black'}}>GPT-4o</option>
+      <option value="gemini" style={{color: 'black'}}>Gemini</option>
+    </Select>
   );
-};
+});
+
+ModelSelector.displayName = 'ModelSelector';
 
 export default ModelSelector;

@@ -1,0 +1,60 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #2D3748; /* Chakra gray.800 equivalent for base text */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Ensure form elements have visible text */
+input, select, textarea, button, option {
+  color: #2D3748 !important; /* Force visible text */
+}
+
+/* Fix select dropdown text */
+select option {
+  color: #000 !important;
+  background-color: #fff;
+}
+
+/* Animations for the blinking cursor and text streaming */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}

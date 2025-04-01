@@ -1,17 +1,21 @@
-import { ModelType } from "../components/ModelSelector";
+export type MessageRole = 'user' | 'assistant' | 'system';
 
 export interface Message {
-  role: "user" | "assistant";
+  id: string;
+  role: MessageRole;
   content: string;
   timestamp: number;
-  isThinking?: boolean;
-  modelName?: ModelType;
 }
 
-export interface ChatRequest {
-  messages: {
-    role: string;
-    content: string;
-  }[];
-  system_prompt?: string;
+export interface ChatState {
+  messages: Message[];
+  isLoading: boolean;
+  error: string | null;
+  selectedModel: string;
 }
+
+export type StreamingTextOptions = {
+  onToken: (token: string) => void;
+  onComplete: () => void;
+  onError: (error: Error) => void;
+};

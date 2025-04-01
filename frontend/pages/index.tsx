@@ -1,24 +1,19 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import ChatInterface from "../components/ChatInterface";
-import theme from "../theme";
+import { Box, Container } from '@chakra-ui/react';
+import Head from 'next/head';
+import { ChatInterface } from '../components';
 
-const Home: NextPage = () => {
+export default function Home() {
   return (
-    <ChakraProvider theme={theme}>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+    <Box minH="100vh" bg="gray.50">
       <Head>
-        <title>AI Chatbot with Claude</title>
-        <meta name="description" content="Chat with Claude AI" />
+        <title>AI Chatbot</title>
+        <meta name="description" content="AI Chatbot with Claude" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <Container maxW="container.lg" py={8}>
         <ChatInterface />
-      </main>
-    </ChakraProvider>
+      </Container>
+    </Box>
   );
-};
-
-export default Home;
+}

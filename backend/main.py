@@ -94,11 +94,19 @@ async def health_check():
 # Claude streaming handler
 async def handle_claude_stream(messages):
     async def generate_response():
+        # Filter out empty messages except for the last one if it's from the assistant
+        filtered_messages = []
+        for i, msg in enumerate(messages):
+            # Skip messages with empty content unless it's the last message and from the assistant
+            if not msg.get('content') and not (i == len(messages) - 1 and msg.get('role') == 'assistant'):
+                continue
+            filtered_messages.append(msg)
+            
         with client.messages.stream(
             model="claude-3-7-sonnet-20250219",
             max_tokens=2000,
             system=SYSTEM_PROMPT,
-            messages=messages,
+            messages=filtered_messages,
         ) as stream:
             for text in stream.text_stream:
                 yield text
