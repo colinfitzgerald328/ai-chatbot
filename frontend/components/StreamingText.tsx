@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
-import { Box, Text, ListItem, UnorderedList, OrderedList, Heading, Divider } from '@chakra-ui/react';
+import { Box, Text, ListItem, UnorderedList, OrderedList, Heading, Divider, Button, useToast } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
@@ -21,6 +21,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
   const textRef = useRef<string>('');
   const animationRef = useRef<number>(0);
   const lastUpdateTimeRef = useRef<number>(0);
+  const toast = useToast();
   
   // More efficient rendering approach using RAF with timing control
   useEffect(() => {
@@ -70,6 +71,32 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     };
   }, [text, complete, displayedText, isComplete, speed]);
   
+  // Function to copy code to clipboard
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        toast({
+          title: "Code copied to clipboard",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          position: "top"
+        });
+      },
+      (err) => {
+        console.error('Could not copy text: ', err);
+        toast({
+          title: "Failed to copy",
+          description: "Please try again",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top"
+        });
+      }
+    );
+  };
+
   // Memoize components for ReactMarkdown to prevent unnecessary re-renders
   const components = useMemo(() => ({
     h1: (props: any) => <Heading as="h1" size="xl" mt={6} mb={4} color="gray.800" fontWeight="bold" {...props} />,
@@ -103,6 +130,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     code: ({ node, inline, className, children, ...props }: any) => {
       const match = /language-(\w+)/.exec(className || '');
       const lang = match && match[1] ? match[1] : '';
+      const codeString = String(children).replace(/\n$/, '');
       
       if (inline) {
         return (
@@ -125,7 +153,24 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
       }
       
       return (
-        <Box my={4} borderRadius="md" overflow="hidden" boxShadow="md" className="markdown-code-block">
+        <Box my={4} borderRadius="md" overflow="hidden" boxShadow="md" className="markdown-code-block" position="relative">
+          {/* Copy button */}
+          <Button
+            position="absolute"
+            top="8px"
+            right="8px"
+            size="xs"
+            colorScheme="purple"
+            opacity="0.7"
+            _hover={{ opacity: 1 }}
+            onClick={() => copyToClipboard(codeString)}
+            zIndex={10}
+            aria-label="Copy code"
+            className="copy-code-button"
+          >
+            Copy
+          </Button>
+          
           <SyntaxHighlighter
             style={{
               ...atomDark,
@@ -156,7 +201,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
               background: '#1a1a1a'
             }}
           >
-            {String(children).replace(/\n$/, '')}
+            {codeString}
           </SyntaxHighlighter>
         </Box>
       );
@@ -173,7 +218,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     table: (props: any) => (
       <Box
         as="table"
-        width="full"
+        width="100%"
         my={4}
         borderWidth="1px"
         borderColor="gray.200"
@@ -189,7 +234,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
       <Box as="tbody" {...props} />
     ),
     tr: (props: any) => (
-      <Box as="tr" borderBottomWidth="1px" borderColor="gray.200" {...props} />
+      <Box as="tr" borderTopWidth="1px" borderColor="gray.200" {...props} />
     ),
     th: (props: any) => (
       <Box
