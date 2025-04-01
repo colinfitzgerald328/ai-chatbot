@@ -231,8 +231,9 @@ const ChatInterface: React.FC = () => {
       bg="white"
       boxShadow="xl"
       borderRadius="xl"
-      maxH="80vh"
-      minH={{ base: '60vh', md: '70vh' }}
+      height="calc(100vh - 4rem)"
+      display="flex"
+      flexDirection="column"
       overflow="hidden"
     >
       <CardHeader
