@@ -26,6 +26,28 @@ const config: ThemeConfig = {
   useSystemColorMode: true,
 };
 
+// Define font weights and styles
+const typography = {
+  fonts: {
+    heading: '"Outfit", system-ui, sans-serif',
+    body: '"IBM Plex Sans", system-ui, sans-serif',
+    mono: '"IBM Plex Mono", monospace',
+  },
+  fontWeights: {
+    normal: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+  },
+  letterSpacings: {
+    tighter: '-0.05em',
+    tight: '-0.025em',
+    normal: '0',
+    wide: '0.025em',
+    wider: '0.05em',
+  },
+};
+
 // Define consistent component styles
 const components = {
   Button: {
@@ -63,6 +85,12 @@ const components = {
   Heading: {
     baseStyle: {
       fontWeight: "semibold",
+      letterSpacing: "tight",
+    },
+  },
+  Text: {
+    baseStyle: {
+      letterSpacing: "normal",
     },
   },
 };
@@ -71,11 +99,7 @@ const theme = extendTheme({
   config,
   colors,
   components,
-  fonts: {
-    heading:
-      'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-    body: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-  },
+  ...typography,
   styles: {
     global: (props: any) => ({
       body: {

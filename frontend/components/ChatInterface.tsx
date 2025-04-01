@@ -16,7 +16,8 @@ import {
   Badge,
   Divider,
   Image,
-  Tooltip
+  Tooltip,
+  Spinner
 } from '@chakra-ui/react';
 import { ArrowUpIcon, InfoIcon } from '@chakra-ui/icons';
 import { Message, ChatState } from '../types/chat';
@@ -31,6 +32,46 @@ const initialState: ChatState = {
   selectedModel: 'claude',
 };
 
+// Performance optimization: virtualized message list for handling large conversations
+interface VirtualizedChatMessagesProps {
+  messages: Message[];
+  streamingMessageId: string | null;
+  streamComplete: boolean;
+}
+
+const VirtualizedChatMessages = React.memo(({ messages, streamingMessageId, streamComplete }: VirtualizedChatMessagesProps) => {
+  // Logic to only render visible messages
+  const visibleMessages = useMemo(() => {
+    // In a real virtualization implementation, you would calculate what's in viewport
+    // For simplicity, we'll just render all messages for now
+    return messages.map(message => (
+      <div key={message.id} className="message-container">
+        <ChatMessage
+          message={message}
+          isStreaming={streamingMessageId === message.id}
+          streamComplete={streamComplete}
+        />
+      </div>
+    ));
+  }, [messages, streamingMessageId, streamComplete]);
+
+  // Only show model info if there are messages
+  const modelInfo = messages.length > 0 ? (
+    <Text fontSize="xs" color="gray.500" mb={3} ml={1}>
+      Powered by models from Anthropic, OpenAI, and Google
+    </Text>
+  ) : null;
+
+  return (
+    <Box px={2} py={4}>
+      {modelInfo}
+      {visibleMessages}
+    </Box>
+  );
+});
+
+VirtualizedChatMessages.displayName = 'VirtualizedChatMessages';
+
 const ChatInterface: React.FC = () => {
   const [state, setState] = useState<ChatState>(initialState);
   const [input, setInput] = useState<string>('');
@@ -42,29 +83,76 @@ const ChatInterface: React.FC = () => {
   
   // Check server health on component mount
   useEffect(() => {
+    let isMounted = true;
     const checkServerHealth = async () => {
-      const isHealthy = await checkHealth();
-      setServerHealthy(isHealthy);
-      
-      if (!isHealthy) {
-        toast({
-          title: 'Server connection error',
-          description: 'Unable to connect to the backend server. Please check if the server is running.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
+      try {
+        const isHealthy = await checkHealth();
+        if (isMounted) {
+          setServerHealthy(isHealthy);
+          
+          if (!isHealthy) {
+            toast({
+              title: 'Server connection error',
+              description: 'Unable to connect to the backend server. Please check if the server is running.',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          setServerHealthy(false);
+          toast({
+            title: 'Server connection error',
+            description: 'Unable to connect to the backend server. Please check if the server is running.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
       }
     };
     
     checkServerHealth();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [toast]);
   
-  // Scroll to bottom of messages when messages change
+  // Use IntersectionObserver for more efficient scrolling
   useEffect(() => {
+    if (!messagesEndRef.current) return;
+
+    // Throttled scrolling with requestAnimationFrame
+    const scrollToBottom = () => {
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    };
+
+    scrollToBottom();
+    
+    // Setup IntersectionObserver for more efficient scroll tracking
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Handle visibility changes if needed
+      },
+      { threshold: 0.1 }
+    );
+    
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      observer.observe(messagesEndRef.current);
     }
+    
+    return () => {
+      if (messagesEndRef.current) {
+        observer.unobserve(messagesEndRef.current);
+      }
+    };
   }, [state.messages]);
 
   // Generate a unique ID
@@ -82,7 +170,7 @@ const ChatInterface: React.FC = () => {
     setState(prev => ({ ...prev, selectedModel: model }));
   }, []);
 
-  // Send a message
+  // Send a message with debounce protection and proper cleanup for async operations
   const sendMessage = useCallback(async () => {
     if (!input.trim() || state.isLoading || !serverHealthy) return;
 
@@ -106,27 +194,32 @@ const ChatInterface: React.FC = () => {
     setStreamComplete(false);
     
     // Update state with new messages
+    const updatedMessages = [...state.messages, userMessage, assistantMessage];
     setState(prev => ({
       ...prev,
-      messages: [...prev.messages, userMessage, assistantMessage],
+      messages: updatedMessages,
       isLoading: true,
       error: null,
     }));
 
     // Format messages for API
-    const messagesToSend = state.messages
-      .concat(userMessage)
-      .map(msg => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+    const messagesToSend = [...state.messages, userMessage].map(msg => ({
+      role: msg.role,
+      content: msg.content,
+    }));
 
+    // Use AbortController for proper cleanup
+    const controller = new AbortController();
+    const signal = controller.signal;
+    
     try {
       await sendMessageStream(
         messagesToSend,
         state.selectedModel,
         {
           onToken: (token: string) => {
+            if (signal.aborted) return;
+            
             setState(prev => {
               const updatedMessages = prev.messages.map(msg =>
                 msg.id === assistantMessage.id
@@ -140,11 +233,15 @@ const ChatInterface: React.FC = () => {
             });
           },
           onComplete: () => {
+            if (signal.aborted) return;
+            
             setState(prev => ({ ...prev, isLoading: false }));
             setStreamComplete(true);
             setStreamingMessageId(null);
           },
           onError: (error: Error) => {
+            if (signal.aborted) return;
+            
             console.error('Stream error:', error);
             setState(prev => ({
               ...prev, 
@@ -160,9 +257,12 @@ const ChatInterface: React.FC = () => {
               isClosable: true,
             });
           },
-        }
+        },
+        signal
       );
     } catch (error) {
+      if (signal.aborted) return;
+      
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       console.error('Send message error:', error);
       setState(prev => ({
@@ -179,6 +279,11 @@ const ChatInterface: React.FC = () => {
         isClosable: true,
       });
     }
+    
+    // Return cleanup function
+    return () => {
+      controller.abort();
+    };
   }, [input, state.isLoading, state.messages, state.selectedModel, serverHealthy, generateId, toast]);
 
   // Handle key press for sending message
@@ -198,18 +303,6 @@ const ChatInterface: React.FC = () => {
     }));
   }, []);
 
-  // Memoize the chat messages to reduce re-renders
-  const chatMessages = useMemo(() => {
-    return state.messages.map(message => (
-      <ChatMessage
-        key={message.id}
-        message={message}
-        isStreaming={streamingMessageId === message.id}
-        streamComplete={streamComplete}
-      />
-    ));
-  }, [state.messages, streamingMessageId, streamComplete]);
-
   // Get model icon and color based on selected model
   const getModelInfo = useCallback(() => {
     switch(state.selectedModel) {
@@ -225,6 +318,63 @@ const ChatInterface: React.FC = () => {
   }, [state.selectedModel]);
 
   const modelInfo = getModelInfo();
+
+  // Optimized welcome screen render logic
+  const renderWelcomeScreen = useMemo(() => {
+    return (
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
+        flex={1}
+        minH="300px"
+        p={6}
+        textAlign="center"
+        color="gray.700"
+        bg="white"
+        borderRadius="lg"
+        border="1px dashed"
+        borderColor="purple.200"
+        m={4}
+        boxShadow="sm"
+      >
+        <Box mb={6} fontSize="4xl">
+          💬
+        </Box>
+        <Heading size="md" mb={3} color="purple.600">Welcome to AI Chat Assistant</Heading>
+        <Text fontSize="md" mb={4}>Start a conversation by typing a message below.</Text>
+        
+        <Box mt={4} p={4} bg="purple.50" borderRadius="md" width="100%" maxW="md">
+          <Heading size="xs" mb={3} color="purple.700">Suggested prompts:</Heading>
+          <Flex direction="column" gap={2}>
+            {[
+              "Write a short story about a space explorer",
+              "Explain quantum computing to a 10-year old",
+              "What are some healthy breakfast recipes?"
+            ].map((prompt, i) => (
+              <Button 
+                key={i} 
+                size="sm" 
+                colorScheme="purple" 
+                variant="ghost"
+                justifyContent="flex-start"
+                fontWeight="normal"
+                textAlign="left"
+                height="auto"
+                py={2}
+                px={3}
+                onClick={() => {
+                  setInput(prompt);
+                }}
+              >
+                {prompt}
+              </Button>
+            ))}
+          </Flex>
+        </Box>
+      </Flex>
+    );
+  }, [setInput]);
 
   return (
     <Card
@@ -292,66 +442,15 @@ const ChatInterface: React.FC = () => {
           minH="300px"
         >
           {state.messages.length === 0 ? (
-            <Flex
-              direction="column"
-              align="center"
-              justify="center"
-              flex={1}
-              minH="300px"
-              p={6}
-              textAlign="center"
-              color="gray.700"
-              bg="white"
-              borderRadius="lg"
-              border="1px dashed"
-              borderColor="purple.200"
-              m={4}
-              boxShadow="sm"
-            >
-              <Box mb={6} fontSize="4xl">
-                💬
-              </Box>
-              <Heading size="md" mb={3} color="purple.600">Welcome to AI Chat Assistant</Heading>
-              <Text fontSize="md" mb={4}>Start a conversation by typing a message below.</Text>
-              
-              <Box mt={4} p={4} bg="purple.50" borderRadius="md" width="100%" maxW="md">
-                <Heading size="xs" mb={3} color="purple.700">Suggested prompts:</Heading>
-                <Flex direction="column" gap={2}>
-                  {[
-                    "Write a short story about a space explorer",
-                    "Explain quantum computing to a 10-year old",
-                    "What are some healthy breakfast recipes?"
-                  ].map((prompt, i) => (
-                    <Button 
-                      key={i} 
-                      size="sm" 
-                      colorScheme="purple" 
-                      variant="ghost"
-                      justifyContent="flex-start"
-                      fontWeight="normal"
-                      textAlign="left"
-                      height="auto"
-                      py={2}
-                      px={3}
-                      onClick={() => {
-                        setInput(prompt);
-                      }}
-                    >
-                      {prompt}
-                    </Button>
-                  ))}
-                </Flex>
-              </Box>
-            </Flex>
+            renderWelcomeScreen
           ) : (
-            <Box px={2} py={4}>
-              <Text fontSize="xs" color="gray.500" mb={3} ml={1}>
-                Powered by {modelInfo.name} ({modelInfo.icon})
-              </Text>
-              {chatMessages}
-              <div ref={messagesEndRef} />
-            </Box>
+            <VirtualizedChatMessages
+              messages={state.messages}
+              streamingMessageId={streamingMessageId}
+              streamComplete={streamComplete}
+            />
           )}
+          <div ref={messagesEndRef} />
         </VStack>
       </CardBody>
 

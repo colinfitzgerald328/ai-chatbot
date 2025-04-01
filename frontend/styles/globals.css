@@ -10,6 +10,25 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   color: #2D3748; /* Chakra gray.800 equivalent for base text */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* Improved typography settings */
+p, li, input, textarea, button, div {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Outfit", system-ui, sans-serif;
+  line-height: 1.2;
+}
+
+code, pre, .code {
+  font-family: "IBM Plex Mono", monospace;
 }
 
 a {
@@ -35,12 +54,28 @@ select option {
   100% { opacity: 1; }
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling with GPU acceleration */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Optimize hardware acceleration for animations */
+.chakra-ui-light [class*="animate-"],
+[class*="animation-"],
+[style*="animation"],
+[style*="transform"] {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Optimize scrolling performance */
+* {
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+/* Custom scrollbar with GPU acceleration */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -53,8 +88,39 @@ html {
 ::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 8px;
+  will-change: background;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #aaa;
+}
+
+/* Optimize rendering performance for chat messages */
+.message-container {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Reduce paint/layout operations by using transform instead of top/left for animations */
+[class*="animation"],
+[class*="transition"] {
+  transform: translateZ(0);
+}
+
+/* Font size adjustments for better readability */
+.chat-message-content {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.chat-message-header {
+  font-weight: 600;
+}
+
+/* Ensure code blocks are properly styled */
+pre code {
+  font-size: 0.9em;
+  line-height: 1.5;
+  font-family: "IBM Plex Mono", monospace !important;
 }

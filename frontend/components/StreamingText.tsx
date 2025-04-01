@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, memo } from 'react';
+import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
 import { Box, Text, ListItem, UnorderedList, OrderedList, Heading, Divider } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -20,12 +20,14 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const textRef = useRef<string>('');
   const animationRef = useRef<number>(0);
+  const lastUpdateTimeRef = useRef<number>(0);
   
+  // More efficient rendering approach using RAF with timing control
   useEffect(() => {
     textRef.current = text;
     
+    // If stream is complete but we haven't rendered all text, show it all at once
     if (complete && displayedText !== text) {
-      // If stream is complete but we haven't rendered all text, show it all at once
       setDisplayedText(text);
       setIsComplete(true);
       return;
@@ -35,7 +37,14 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
       setIsComplete(true);
     }
     
-    const animate = () => {
+    const animate = (timestamp: number) => {
+      // Control frame rate for more consistent performance
+      const elapsed = timestamp - lastUpdateTimeRef.current;
+      if (elapsed < 16) { // Target ~60fps
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       if (displayedText.length < textRef.current.length) {
         const charsToAdd = Math.min(
           speed, 
@@ -45,6 +54,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
         setDisplayedText(prevText => 
           textRef.current.substring(0, prevText.length + charsToAdd)
         );
+        lastUpdateTimeRef.current = timestamp;
         animationRef.current = requestAnimationFrame(animate);
       } else if (!isComplete && complete) {
         setIsComplete(true);
@@ -54,12 +64,14 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     animationRef.current = requestAnimationFrame(animate);
     
     return () => {
-      cancelAnimationFrame(animationRef.current);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
   }, [text, complete, displayedText, isComplete, speed]);
   
-  // Define custom components for ReactMarkdown
-  const components = {
+  // Memoize components for ReactMarkdown to prevent unnecessary re-renders
+  const components = useMemo(() => ({
     h1: (props: any) => <Heading as="h1" size="xl" mt={6} mb={4} color="gray.800" fontWeight="bold" {...props} />,
     h2: (props: any) => <Heading as="h2" size="lg" mt={5} mb={3} color="gray.800" fontWeight="bold" {...props} />,
     h3: (props: any) => <Heading as="h3" size="md" mt={4} mb={2} color="gray.800" fontWeight="bold" {...props} />,
@@ -179,17 +191,37 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     em: (props: any) => (
       <Box as="em" fontStyle="italic" {...props} />
     ),
-  };
+  }), []); // Empty dependency array as these don't rely on props
   
-  return (
-    <Box color="gray.800">
+  // Using React.useMemo to optimize markdown parsing
+  const markdownContent = useMemo(() => {
+    return (
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={components}
       >
         {displayedText}
       </ReactMarkdown>
-      {!isComplete && <Box as="span" animation="blink 1s infinite">&#x2503;</Box>}
+    );
+  }, [displayedText, components]);
+
+  // Only re-render cursor when isComplete changes
+  const cursor = useMemo(() => {
+    return !isComplete && (
+      <Box 
+        as="span" 
+        animation="blink 1s infinite"
+        aria-hidden="true"
+      >
+        &#x2503;
+      </Box>
+    );
+  }, [isComplete]);
+  
+  return (
+    <Box color="gray.800">
+      {markdownContent}
+      {cursor}
     </Box>
   );
 });
