@@ -327,26 +327,26 @@ const ChatInterface: React.FC = () => {
         align="center"
         justify="center"
         flex={1}
-        minH="300px"
-        p={6}
+        minH={{ base: "250px", md: "300px" }}
+        p={{ base: 4, md: 6 }}
         textAlign="center"
         color="gray.700"
         bg="white"
         borderRadius="lg"
         border="1px dashed"
         borderColor="purple.200"
-        m={4}
+        m={{ base: 2, md: 4 }}
         boxShadow="sm"
+        className="welcome-screen"
+        overflowY="auto"
       >
-        <Box mb={6} fontSize="4xl">
-          💬
-        </Box>
-        <Heading size="md" mb={3} color="purple.600">Welcome to AI Chat Assistant</Heading>
-        <Text fontSize="md" mb={4}>Start a conversation by typing a message below.</Text>
+        <Box mb={6} fontSize="5xl">🤔</Box>
+        <Heading size="lg" mb={3} color="purple.600" letterSpacing="-0.02em">Welcome to AI Chat Assistant</Heading>
+        <Text fontSize="md" mb={6}>Start a conversation by typing a message below.</Text>
         
-        <Box mt={4} p={4} bg="purple.50" borderRadius="md" width="100%" maxW="md">
-          <Heading size="xs" mb={3} color="purple.700">Suggested prompts:</Heading>
-          <Flex direction="column" gap={2}>
+        <Box mt={4} p={5} bg="purple.50" borderRadius="lg" width="100%" maxW="md">
+          <Heading size="sm" mb={4} color="purple.700">Suggested prompts:</Heading>
+          <Flex direction="column" gap={3}>
             {[
               "Write a short story about a space explorer",
               "Explain quantum computing to a 10-year old",
@@ -354,18 +354,20 @@ const ChatInterface: React.FC = () => {
             ].map((prompt, i) => (
               <Button 
                 key={i} 
-                size="sm" 
+                size="md" 
                 colorScheme="purple" 
                 variant="ghost"
                 justifyContent="flex-start"
                 fontWeight="normal"
                 textAlign="left"
                 height="auto"
-                py={2}
-                px={3}
+                py={3}
+                px={4}
                 onClick={() => {
                   setInput(prompt);
                 }}
+                className="prompt-button"
+                leftIcon={<span style={{ fontSize: '1.2em', marginRight: '8px' }}>→</span>}
               >
                 {prompt}
               </Button>
@@ -380,33 +382,38 @@ const ChatInterface: React.FC = () => {
     <Card
       bg="white"
       boxShadow="xl"
-      borderRadius="xl"
-      height="calc(100vh - 4rem)"
+      borderRadius={{ base: '0', md: 'xl' }}
+      minH={{ base: 'calc(100vh - 20px)', md: 'calc(100vh - 40px)' }}
+      maxH={{ base: 'calc(100vh)', md: 'calc(100vh - 40px)' }}
+      width="100%"
+      maxW="100%"
       display="flex"
       flexDirection="column"
       overflow="hidden"
+      className="chat-card"
+      margin="0"
     >
       <CardHeader
         bg="purple.50"
         borderBottom="1px solid"
         borderColor="gray.200"
-        px={6}
-        py={4}
+        px={{ base: 4, md: 6, lg: 8 }}
+        py={{ base: 3, md: 4 }}
+        className="chat-header"
       >
         <Flex 
-          justify="space-between" 
+          justify="space-evenly" 
           align="center"
           wrap={{ base: 'wrap', md: 'nowrap' }}
-          gap={{ base: 2, md: 0 }}
+          gap={{ base: 4, md: 4 }}
         >
           {/* Left side: Title */}
-          <Heading size="md" fontWeight="semibold" color="purple.600" mr={2}>AI Chat Assistant</Heading>
+          <Heading size="md" fontWeight="semibold" color="purple.600" letterSpacing="-0.02em">AI Chat Assistant</Heading>
           
           {/* Right side: Controls */}
           <Flex 
             align="center" 
             gap={4}
-            ml={{ base: 0, md: 'auto' }}
             flexShrink={0}
           >
             <Flex align="center" gap={2}>
@@ -423,10 +430,11 @@ const ChatInterface: React.FC = () => {
             <Button
               size="sm"
               variant="outline"
-              colorScheme="gray"
+              colorScheme="purple"
               onClick={clearChat}
               isDisabled={state.isLoading || state.messages.length === 0}
               flexShrink={0}
+              _hover={{ bg: 'purple.50' }}
             >
               Clear Chat
             </Button>
@@ -438,8 +446,12 @@ const ChatInterface: React.FC = () => {
         <VStack
           align="stretch"
           spacing={0}
-          p={4}
+          p={{ base: 3, md: 6 }}
           minH="300px"
+          className="messages-container"
+          mx="auto"
+          maxW={{ base: "100%", lg: "90%", xl: "80%" }}
+          pb={{ base: 16, md: 20 }}
         >
           {state.messages.length === 0 ? (
             renderWelcomeScreen
@@ -455,12 +467,13 @@ const ChatInterface: React.FC = () => {
       </CardBody>
 
       <CardFooter
-        p={4}
+        p={{ base: 3, md: 4, lg: 5 }}
         borderTop="1px solid"
         borderColor="gray.200"
         bg="white"
+        className="chat-footer"
       >
-        <VStack w="100%" spacing={3}>
+        <VStack w="100%" spacing={3} maxW={{ base: "100%", lg: "90%", xl: "80%" }} mx="auto">
           <Flex w="100%" position="relative">
             <Input
               placeholder="Type your message..."
@@ -479,28 +492,53 @@ const ChatInterface: React.FC = () => {
                 borderColor: 'purple.500',
                 boxShadow: '0 0 0 1px var(--chakra-colors-purple-500)',
               }}
-              borderRightRadius={0}
+              className="chat-input"
               py={6}
               pl={4}
               pr={12}
             />
-            <IconButton
-              aria-label="Send message"
-              icon={<ArrowUpIcon />}
-              onClick={sendMessage}
-              isLoading={state.isLoading}
-              isDisabled={!input.trim() || !serverHealthy}
-              colorScheme="purple"
-              borderLeftRadius={0}
+            <Flex
               position="absolute"
               right={0}
               top={0}
               height="100%"
-              width="48px"
+              align="center"
+              justify="center"
+              pr={1}
               zIndex={2}
-              opacity={input.trim() ? 1 : 0.7}
-              _hover={{ opacity: 1 }}
-            />
+            >
+              <Button
+                aria-label="Send message"
+                onClick={sendMessage}
+                isLoading={state.isLoading}
+                isDisabled={!input.trim() || !serverHealthy}
+                colorScheme="purple"
+                size="md"
+                width="auto"
+                minW="40px"
+                height="80%"
+                opacity={input.trim() ? 1 : 0.7}
+                className="send-button"
+                borderRadius="md"
+                transition="all 0.2s ease"
+                _hover={{ 
+                  transform: 'translateY(-2px)', 
+                  boxShadow: '0 4px 8px rgba(113, 44, 249, 0.2)',
+                  bg: 'purple.400'
+                }}
+                _active={{ 
+                  transform: 'translateY(0)', 
+                  boxShadow: 'none' 
+                }}
+                px={input.trim() ? 4 : 0}
+                fontWeight="medium"
+              >
+                <Flex align="center" justify="center">
+                  <ArrowUpIcon transform="rotate(45deg)" />
+                  {input.trim() && <Text ml={2} display={{base: 'none', sm: 'block'}}>Send</Text>}
+                </Flex>
+              </Button>
+            </Flex>
           </Flex>
           
           {serverHealthy === false && (

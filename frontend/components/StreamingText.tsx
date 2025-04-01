@@ -102,45 +102,71 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
     ),
     code: ({ node, inline, className, children, ...props }: any) => {
       const match = /language-(\w+)/.exec(className || '');
-      return !inline && match ? (
-        <Box my={4} borderRadius="md" overflow="hidden">
+      const lang = match && match[1] ? match[1] : '';
+      
+      if (inline) {
+        return (
+          <Box
+            as="code"
+            bg="rgba(113, 44, 249, 0.08)"
+            color="#712cf9"
+            px={1}
+            py={0.5}
+            borderRadius="sm"
+            fontFamily="mono"
+            fontSize="0.875em"
+            fontWeight="medium"
+            whiteSpace="nowrap"
+            {...props}
+          >
+            {children}
+          </Box>
+        );
+      }
+      
+      return (
+        <Box my={4} borderRadius="md" overflow="hidden" boxShadow="md" className="markdown-code-block">
           <SyntaxHighlighter
-            style={atomDark}
-            language={match[1]}
+            style={{
+              ...atomDark,
+              'code[class*="language-"]': {
+                ...atomDark['code[class*="language-"]'],
+                fontFamily: '"IBM Plex Mono", monospace',
+                fontSize: '14px',
+                lineHeight: '1.5',
+              },
+              'pre[class*="language-"]': {
+                ...atomDark['pre[class*="language-"]'],
+                background: '#1a1a1a',
+                padding: '1.25em',
+                margin: '0',
+                overflow: 'auto',
+                borderRadius: '6px',
+              }
+            }}
+            language={lang || 'text'}
             PreTag="div"
             wrapLines={true}
             showLineNumbers={true}
-            {...props}
+            wrapLongLines={false}
+            customStyle={{
+              borderRadius: '0.375rem',
+              margin: '0',
+              padding: '0',
+              background: '#1a1a1a'
+            }}
           >
             {String(children).replace(/\n$/, '')}
           </SyntaxHighlighter>
-        </Box>
-      ) : (
-        <Box
-          as="code"
-          bg="gray.100"
-          color="gray.800"
-          px={1}
-          py={0.5}
-          borderRadius="sm"
-          fontFamily="monospace"
-          fontSize="0.875em"
-          fontWeight="medium"
-          {...props}
-        >
-          {children}
         </Box>
       );
     },
     pre: (props: any) => (
       <Box
-        as="pre"
-        overflowX="auto"
-        bg="gray.50"
-        p={4}
-        borderRadius="md"
-        color="gray.800"
-        my={4}
+        w="100%"
+        position="relative"
+        overflow="auto"
+        className="markdown-pre"
         {...props}
       />
     ),

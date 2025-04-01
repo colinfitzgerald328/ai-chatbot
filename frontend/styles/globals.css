@@ -14,6 +14,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  background-color: #f9fafb;
 }
 
 /* Improved typography settings */
@@ -25,6 +26,7 @@ p, li, input, textarea, button, div {
 h1, h2, h3, h4, h5, h6 {
   font-family: "Outfit", system-ui, sans-serif;
   line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 
 code, pre, .code {
@@ -47,11 +49,162 @@ select option {
   background-color: #fff;
 }
 
+/* Enhanced chat message styling */
+.message-container {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* User message bubble styling */
+.user-message {
+  background: linear-gradient(135deg, #8a45ff 0%, #712cf9 100%);
+  border-radius: 18px 18px 0 18px;
+  box-shadow: 0 4px 12px rgba(138, 69, 255, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.user-message:hover {
+  box-shadow: 0 6px 16px rgba(138, 69, 255, 0.2);
+}
+
+/* AI message bubble styling */
+.ai-message {
+  background: white;
+  border-radius: 18px 18px 18px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: box-shadow 0.3s ease;
+}
+
+.ai-message:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Message appear animation */
+@keyframes messageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.new-message {
+  animation: messageAppear 0.3s ease forwards;
+}
+
 /* Animations for the blinking cursor and text streaming */
 @keyframes blink {
   0% { opacity: 1; }
   50% { opacity: 0; }
   100% { opacity: 1; }
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background-color: #712cf9;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s infinite;
+}
+
+/* Improved welcome screen */
+.welcome-screen {
+  transition: all 0.3s ease;
+  background: linear-gradient(145deg, #ffffff, #f9f5ff);
+  animation: cardFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes cardFloat {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 5px 15px rgba(113, 44, 249, 0.1);
+  }
+  100% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(113, 44, 249, 0.2);
+  }
+}
+
+/* Prompt button hover effect */
+.prompt-button {
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.prompt-button:hover {
+  background-color: rgba(113, 44, 249, 0.08);
+  transform: translateX(3px);
+}
+
+.prompt-button:active {
+  transform: translateX(3px) scale(0.98);
+}
+
+/* Chat input styling enhancements */
+.chat-input {
+  transition: all 0.2s ease;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.chat-input:focus {
+  box-shadow: 0 0 0 2px rgba(113, 44, 249, 0.3), 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Improved send button */
+.send-button {
+  transition: all 0.2s ease;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(113, 44, 249, 0.25);
+}
+
+.send-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Improved scrollbar with GPU acceleration */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 8px;
+  will-change: background;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #712cf9;
+}
+
+/* Improved chat card with subtle shadow */
+.chat-card {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.01);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  height: 100vh !important;
 }
 
 /* Smooth scrolling with GPU acceleration */
@@ -69,33 +222,6 @@ html {
   transform: translateZ(0);
 }
 
-/* Optimize scrolling performance */
-* {
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-  scrollbar-width: thin; /* For Firefox */
-}
-
-/* Custom scrollbar with GPU acceleration */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 8px;
-  will-change: background;
-  transition: background 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
-
 /* Optimize rendering performance for chat messages */
 .message-container {
   transform: translateZ(0);
@@ -108,9 +234,9 @@ html {
   transform: translateZ(0);
 }
 
-/* Font size adjustments for better readability */
+/* Font size adjustments and responsive typography */
 .chat-message-content {
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   line-height: 1.6;
 }
 
@@ -118,9 +244,240 @@ html {
   font-weight: 600;
 }
 
+/* Chat interface responsive adjustments */
+@media (max-width: 768px) {
+  .chat-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .ai-message, .user-message {
+    max-width: 90% !important;
+  }
+  
+  .chat-header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  .chat-footer {
+    padding: 8px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Ensure messages don't overflow on mobile */
+  .message-container {
+    max-width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* Full width chat interface */
+.messages-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Loading state animations */
+@keyframes pulseBackground {
+  0% { background-color: rgba(113, 44, 249, 0.05); }
+  50% { background-color: rgba(113, 44, 249, 0.1); }
+  100% { background-color: rgba(113, 44, 249, 0.05); }
+}
+
+.loading-pulse {
+  animation: pulseBackground 2s ease-in-out infinite;
+}
+
+/* Enhanced markdown code block styles */
+.markdown-code-block {
+  margin: 1.5em 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.markdown-code-block pre {
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #1a1a1a !important;
+}
+
+.markdown-pre {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Fix line numbers in code blocks */
+.linenumber {
+  min-width: 2.5em !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  padding-right: 1em !important;
+  text-align: right !important;
+  user-select: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-right: 0.5em !important;
+}
+
+/* Ensure proper code rendering */
+code[class*="language-"],
+pre[class*="language-"] {
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  white-space: pre !important;
+  word-spacing: normal !important;
+  word-break: normal !important;
+  tab-size: 4 !important;
+  hyphens: none !important;
+}
+
+/* Fix inline code highlighting */
+:not(pre) > code {
+  color: #712cf9 !important;
+  background-color: rgba(113, 44, 249, 0.08) !important;
+  padding: 0.1em 0.4em !important;
+  border-radius: 4px !important;
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 0.9em !important;
+  white-space: nowrap !important;
+}
+
+/* Make code block content visible on all backgrounds */
+.language-js, .language-javascript,
+.language-ts, .language-typescript,
+.language-py, .language-python,
+.language-jsx, .language-tsx,
+.language-css, .language-html,
+.language-json, .language-md,
+.language-bash, .language-sh,
+.language-yaml, .language-text {
+  color: #f8f8f2 !important;
+  text-shadow: none !important;
+}
+
 /* Ensure code blocks are properly styled */
 pre code {
   font-size: 0.9em;
   line-height: 1.5;
   font-family: "IBM Plex Mono", monospace !important;
+  border-radius: 8px;
+  padding: 1em !important;
+  background-color: #1a1a1a !important;
+  color: #f8f8f2 !important;
+  border: 1px solid #2d2d2d;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Inline code styling */
+:not(pre) > code {
+  font-family: "IBM Plex Mono", monospace !important;
+  background-color: rgba(113, 44, 249, 0.08) !important;
+  color: #712cf9 !important;
+  padding: 0.1em 0.4em !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+/* Code block container */
+.markdown-body pre {
+  margin: 1em 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+/* Syntax highlighting colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6a9955 !important;
+}
+
+.token.punctuation {
+  color: #d4d4d4 !important;
+}
+
+.token.property,
+.token.keyword,
+.token.tag {
+  color: #569cd6 !important;
+}
+
+.token.class-name {
+  color: #4ec9b0 !important;
+}
+
+.token.boolean,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f14c4c !important;
+}
+
+.token.number {
+  color: #b5cea8 !important;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #ce9178 !important;
+}
+
+.token.variable {
+  color: #9cdcfe !important;
+}
+
+.token.operator {
+  color: #d4d4d4 !important;
+}
+
+.token.function {
+  color: #dcdcaa !important;
+}
+
+/* Fix for line numbers */
+.linenumber {
+  color: #606366 !important;
+  background-color: #1a1a1a !important;
+  border-right: 1px solid #2d2d2d !important;
+  min-width: 40px !important;
+  text-align: right !important;
+  padding-right: 10px !important;
+}
+
+/* Improve scrollbars in code blocks */
+pre::-webkit-scrollbar {
+  height: 6px !important;
+  width: 6px !important;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 3px !important;
+}
+
+pre::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* Improved chat message spacing */
+.messages-container > div {
+  margin-bottom: 16px;
 }

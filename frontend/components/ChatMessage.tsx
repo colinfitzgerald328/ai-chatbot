@@ -22,34 +22,41 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       mb={5} 
       alignItems="start"
       data-testid={`message-${message.id}`}
-      className="message-container"
+      className={`message-container ${isStreaming ? '' : 'new-message'}`}
+      justifyContent={isUser ? 'flex-end' : 'flex-start'}
+      width="100%"
+      px={{ base: 1, md: 2 }}
     >
-      <Avatar 
-        size="sm" 
-        name={isUser ? 'You' : 'AI Assistant'}
-        bg={isUser ? 'blue.500' : 'purple.500'}
-        color="white"
-        fontWeight="bold"
-      />
+      {!isUser && (
+        <Avatar 
+          size="sm" 
+          name="AI Assistant"
+          bg="purple.500"
+          color="white"
+          fontWeight="bold"
+          boxShadow="0 2px 6px rgba(113, 44, 249, 0.25)"
+          flexShrink={0}
+        />
+      )}
       
       <Box 
-        maxW="90%" 
+        maxW={{ base: "80%", md: "75%" }} 
         py={3} 
         px={4} 
-        borderRadius="lg" 
-        bg={isUser ? 'blue.50' : 'white'}
-        borderWidth={!isUser ? 1 : 0}
-        borderColor="gray.200"
-        boxShadow={!isUser ? 'sm' : 'none'}
+        className={isUser ? 'user-message' : 'ai-message'}
+        color={isUser ? 'white' : 'gray.800'}
+        wordBreak="break-word"
+        overflowWrap="break-word"
       >
         <Flex direction="column" gap={1}>
           <Text 
             fontWeight="semibold" 
             fontSize="sm" 
-            color={isUser ? 'blue.600' : 'purple.600'} 
+            color={isUser ? 'white' : 'purple.600'} 
             mb={1}
             className="chat-message-header"
             letterSpacing="tight"
+            opacity={0.9}
           >
             {isUser ? 'You' : 'AI Assistant'}
           </Text>
@@ -57,10 +64,11 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           {isUser ? (
             <Text 
               whiteSpace="pre-wrap" 
-              color="gray.800" 
+              color={isUser ? 'white' : 'gray.800'} 
               fontSize="md"
               className="chat-message-content"
               letterSpacing="normal"
+              fontWeight="normal"
             >
               {message.content}
             </Text>
@@ -75,6 +83,18 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           )}
         </Flex>
       </Box>
+      
+      {isUser && (
+        <Avatar 
+          size="sm" 
+          name="You"
+          bg="purple.400"
+          color="white"
+          fontWeight="bold"
+          boxShadow="0 2px 6px rgba(113, 44, 249, 0.25)"
+          flexShrink={0}
+        />
+      )}
     </Flex>
   );
 });
