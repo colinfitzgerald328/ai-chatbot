@@ -3,20 +3,20 @@ import { extendTheme, ThemeConfig } from "@chakra-ui/react";
 // Define consistent color tokens
 const colors = {
   brand: {
-    50: "#f5e9ff",
-    100: "#dac1ff",
-    200: "#c098ff",
-    300: "#a56eff",
-    400: "#8a45ff",
-    500: "#712cf9",
-    600: "#5a23c8",
-    700: "#421a96",
-    800: "#2c1165",
-    900: "#170833",
+    50: "#e6f0ff",
+    100: "#bed1ff",
+    200: "#96b2ff",
+    300: "#6e93ff",
+    400: "#4674ff",
+    500: "#2255ed",
+    600: "#1a42be",
+    700: "#13318f",
+    800: "#0c2160",
+    900: "#061131",
   },
   claude: {
-    primary: "#712cf9",
-    secondary: "#8a45ff",
+    primary: "#2255ed",
+    secondary: "#4674ff",
   },
 };
 
@@ -57,10 +57,10 @@ const components = {
     },
     variants: {
       solid: (props: any) => ({
-        bg: props.colorMode === "dark" ? "purple.500" : "purple.500",
+        bg: props.colorMode === "dark" ? "blue.500" : "blue.500",
         color: "white",
         _hover: {
-          bg: props.colorMode === "dark" ? "purple.600" : "purple.400",
+          bg: props.colorMode === "dark" ? "blue.600" : "blue.400",
         },
       }),
     },
@@ -75,8 +75,8 @@ const components = {
             borderColor: props.colorMode === "dark" ? "gray.500" : "gray.400",
           },
           _focus: {
-            borderColor: "purple.400",
-            boxShadow: `0 0 0 1px ${props.colorMode === "dark" ? "purple.400" : "purple.400"}`,
+            borderColor: "blue.400",
+            boxShadow: `0 0 0 1px ${props.colorMode === "dark" ? "blue.400" : "blue.400"}`,
           },
         },
       }),

@@ -58,14 +58,14 @@ select option {
 
 /* User message bubble styling */
 .user-message {
-  background: linear-gradient(135deg, #8a45ff 0%, #712cf9 100%);
+  background: linear-gradient(135deg, #4674ff 0%, #2255ed 100%);
   border-radius: 18px 18px 0 18px;
-  box-shadow: 0 4px 12px rgba(138, 69, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(34, 85, 237, 0.15);
   transition: box-shadow 0.3s ease;
 }
 
 .user-message:hover {
-  box-shadow: 0 6px 16px rgba(138, 69, 255, 0.2);
+  box-shadow: 0 6px 16px rgba(34, 85, 237, 0.2);
 }
 
 /* AI message bubble styling */
@@ -108,7 +108,7 @@ select option {
   display: inline-block;
   width: 2px;
   height: 1.2em;
-  background-color: #712cf9;
+  background-color: #2255ed;
   margin-left: 2px;
   vertical-align: middle;
   animation: blink 1s infinite;
@@ -117,18 +117,18 @@ select option {
 /* Improved welcome screen */
 .welcome-screen {
   transition: all 0.3s ease;
-  background: linear-gradient(145deg, #ffffff, #f9f5ff);
+  background: linear-gradient(145deg, #ffffff, #f0f5ff);
   animation: cardFloat 3s ease-in-out infinite alternate;
 }
 
 @keyframes cardFloat {
   0% {
     transform: translateY(0);
-    box-shadow: 0 5px 15px rgba(113, 44, 249, 0.1);
+    box-shadow: 0 5px 15px rgba(34, 85, 237, 0.1);
   }
   100% {
     transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(113, 44, 249, 0.2);
+    box-shadow: 0 12px 20px rgba(34, 85, 237, 0.2);
   }
 }
 
@@ -140,7 +140,7 @@ select option {
 }
 
 .prompt-button:hover {
-  background-color: rgba(113, 44, 249, 0.08);
+  background-color: rgba(34, 85, 237, 0.08);
   transform: translateX(3px);
 }
 
@@ -156,7 +156,7 @@ select option {
 }
 
 .chat-input:focus {
-  box-shadow: 0 0 0 2px rgba(113, 44, 249, 0.3), 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 2px rgba(34, 85, 237, 0.3), 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
@@ -167,7 +167,7 @@ select option {
 
 .send-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(113, 44, 249, 0.25);
+  box-shadow: 0 4px 12px rgba(34, 85, 237, 0.25);
 }
 
 .send-button:active:not(:disabled) {
@@ -192,7 +192,7 @@ select option {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #712cf9;
+  background: #2255ed;
 }
 
 /* Improved chat card with subtle shadow */
@@ -285,9 +285,9 @@ html {
 
 /* Loading state animations */
 @keyframes pulseBackground {
-  0% { background-color: rgba(113, 44, 249, 0.05); }
-  50% { background-color: rgba(113, 44, 249, 0.1); }
-  100% { background-color: rgba(113, 44, 249, 0.05); }
+  0% { background-color: rgba(34, 85, 237, 0.05); }
+  50% { background-color: rgba(34, 85, 237, 0.1); }
+  100% { background-color: rgba(34, 85, 237, 0.05); }
 }
 
 .loading-pulse {
@@ -342,8 +342,8 @@ pre[class*="language-"] {
 
 /* Fix inline code highlighting */
 :not(pre) > code {
-  color: #712cf9 !important;
-  background-color: rgba(113, 44, 249, 0.08) !important;
+  color: #2255ed !important;
+  background-color: rgba(34, 85, 237, 0.08) !important;
   padding: 0.1em 0.4em !important;
   border-radius: 4px !important;
   font-family: "IBM Plex Mono", monospace !important;
@@ -382,8 +382,8 @@ pre code {
 /* Inline code styling */
 :not(pre) > code {
   font-family: "IBM Plex Mono", monospace !important;
-  background-color: rgba(113, 44, 249, 0.08) !important;
-  color: #712cf9 !important;
+  background-color: rgba(34, 85, 237, 0.08) !important;
+  color: #2255ed !important;
   padding: 0.1em 0.4em !important;
   border-radius: 4px !important;
   font-size: 0.9em !important;
@@ -492,7 +492,7 @@ pre::-webkit-scrollbar-track {
   transition: opacity 0.2s ease !important;
   font-size: 12px !important;
   padding: 4px 8px !important;
-  background-color: rgba(113, 44, 249, 0.8) !important;
+  background-color: rgba(34, 85, 237, 0.8) !important;
   border: none !important;
   border-radius: 4px !important;
   color: white !important;

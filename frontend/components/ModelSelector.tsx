@@ -16,7 +16,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = memo(({
   const getModelInfo = (model: string) => {
     switch(model) {
       case 'claude':
-        return { name: 'Claude', icon: '🧠', color: 'purple' };
+        return { name: 'Claude', icon: '🧠', color: 'blue' };
       case 'gpt':
         return { name: 'GPT-4o', icon: '🤖', color: 'green' };
       case 'gemini':
@@ -50,8 +50,8 @@ const ModelSelector: React.FC<ModelSelectorProps> = memo(({
         width="auto"
         minWidth="120px"
         borderRadius="md"
-        _hover={{ borderColor: 'purple.300' }}
-        _focus={{ borderColor: 'purple.500', boxShadow: '0 0 0 1px var(--chakra-colors-purple-500)' }}
+        _hover={{ borderColor: 'blue.300' }}
+        _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)' }}
         sx={{
           '& option': {
             background: 'white',

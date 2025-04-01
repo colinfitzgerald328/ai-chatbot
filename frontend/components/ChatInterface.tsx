@@ -307,7 +307,7 @@ const ChatInterface: React.FC = () => {
   const getModelInfo = useCallback(() => {
     switch(state.selectedModel) {
       case 'claude':
-        return { name: 'Claude', icon: '🧠', color: 'purple' };
+        return { name: 'Claude', icon: '🧠', color: 'blue' };
       case 'gpt':
         return { name: 'GPT-4o', icon: '🤖', color: 'green' };
       case 'gemini':
@@ -334,18 +334,18 @@ const ChatInterface: React.FC = () => {
         bg="white"
         borderRadius="lg"
         border="1px dashed"
-        borderColor="purple.200"
+        borderColor="blue.200"
         m={{ base: 2, md: 4 }}
         boxShadow="sm"
         className="welcome-screen"
         overflowY="auto"
       >
         <Box mb={6} fontSize="5xl">🤔</Box>
-        <Heading size="lg" mb={3} color="purple.600" letterSpacing="-0.02em">Welcome to AI Chat Assistant</Heading>
+        <Heading size="lg" mb={3} color="blue.600" letterSpacing="-0.02em">Welcome to AI Chat Assistant</Heading>
         <Text fontSize="md" mb={6}>Start a conversation by typing a message below.</Text>
         
-        <Box mt={4} p={5} bg="purple.50" borderRadius="lg" width="100%" maxW="md">
-          <Heading size="sm" mb={4} color="purple.700">Suggested prompts:</Heading>
+        <Box mt={4} p={5} bg="blue.50" borderRadius="lg" width="100%" maxW="md">
+          <Heading size="sm" mb={4} color="blue.700">Suggested prompts:</Heading>
           <Flex direction="column" gap={3}>
             {[
               "Write a short story about a space explorer",
@@ -355,7 +355,7 @@ const ChatInterface: React.FC = () => {
               <Button 
                 key={i} 
                 size="md" 
-                colorScheme="purple" 
+                colorScheme="blue" 
                 variant="ghost"
                 justifyContent="flex-start"
                 fontWeight="normal"
@@ -394,7 +394,7 @@ const ChatInterface: React.FC = () => {
       margin="0"
     >
       <CardHeader
-        bg="purple.50"
+        bg="blue.50"
         borderBottom="1px solid"
         borderColor="gray.200"
         px={{ base: 4, md: 6, lg: 8 }}
@@ -408,7 +408,7 @@ const ChatInterface: React.FC = () => {
           gap={{ base: 4, md: 4 }}
         >
           {/* Left side: Title */}
-          <Heading size="md" fontWeight="semibold" color="purple.600" letterSpacing="-0.02em">AI Chat Assistant</Heading>
+          <Heading size="md" fontWeight="semibold" color="blue.600" letterSpacing="-0.02em">AI Chat Assistant</Heading>
           
           {/* Right side: Controls */}
           <Flex 
@@ -430,11 +430,11 @@ const ChatInterface: React.FC = () => {
             <Button
               size="sm"
               variant="outline"
-              colorScheme="purple"
+              colorScheme="blue"
               onClick={clearChat}
               isDisabled={state.isLoading || state.messages.length === 0}
               flexShrink={0}
-              _hover={{ bg: 'purple.50' }}
+              _hover={{ bg: 'blue.50' }}
             >
               Clear Chat
             </Button>
@@ -487,10 +487,10 @@ const ChatInterface: React.FC = () => {
               fontSize="md"
               _placeholder={{ color: 'gray.500' }}
               borderColor="gray.300"
-              _hover={{ borderColor: 'purple.300' }}
+              _hover={{ borderColor: 'blue.300' }}
               _focus={{
-                borderColor: 'purple.500',
-                boxShadow: '0 0 0 1px var(--chakra-colors-purple-500)',
+                borderColor: 'blue.500',
+                boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)',
               }}
               className="chat-input"
               py={6}
@@ -512,7 +512,7 @@ const ChatInterface: React.FC = () => {
                 onClick={sendMessage}
                 isLoading={state.isLoading}
                 isDisabled={!input.trim() || !serverHealthy}
-                colorScheme="purple"
+                colorScheme="blue"
                 size="md"
                 width="auto"
                 minW="40px"
@@ -524,7 +524,7 @@ const ChatInterface: React.FC = () => {
                 _hover={{ 
                   transform: 'translateY(-2px)', 
                   boxShadow: '0 4px 8px rgba(113, 44, 249, 0.2)',
-                  bg: 'purple.400'
+                  bg: 'blue.400'
                 }}
                 _active={{ 
                   transform: 'translateY(0)', 

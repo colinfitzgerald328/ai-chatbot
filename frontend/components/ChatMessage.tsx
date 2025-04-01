@@ -31,10 +31,10 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
         <Avatar 
           size="sm" 
           name="AI Assistant"
-          bg="purple.500"
+          bg="blue.500"
           color="white"
           fontWeight="bold"
-          boxShadow="0 2px 6px rgba(113, 44, 249, 0.25)"
+          boxShadow="0 2px 6px rgba(34, 85, 237, 0.25)"
           flexShrink={0}
         />
       )}
@@ -52,7 +52,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           <Text 
             fontWeight="semibold" 
             fontSize="sm" 
-            color={isUser ? 'white' : 'purple.600'} 
+            color={isUser ? 'white' : 'blue.600'} 
             mb={1}
             className="chat-message-header"
             letterSpacing="tight"
@@ -88,10 +88,10 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
         <Avatar 
           size="sm" 
           name="You"
-          bg="purple.400"
+          bg="blue.400"
           color="white"
           fontWeight="bold"
-          boxShadow="0 2px 6px rgba(113, 44, 249, 0.25)"
+          boxShadow="0 2px 6px rgba(34, 85, 237, 0.25)"
           flexShrink={0}
         />
       )}

@@ -136,8 +136,8 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
         return (
           <Box
             as="code"
-            bg="rgba(113, 44, 249, 0.08)"
-            color="#712cf9"
+            bg="rgba(34, 85, 237, 0.08)"
+            color="#2255ed"
             px={1}
             py={0.5}
             borderRadius="sm"
@@ -160,7 +160,7 @@ const StreamingText: React.FC<StreamingTextProps> = memo(({
             top="8px"
             right="8px"
             size="xs"
-            colorScheme="purple"
+            colorScheme="blue"
             opacity="0.7"
             _hover={{ opacity: 1 }}
             onClick={() => copyToClipboard(codeString)}
