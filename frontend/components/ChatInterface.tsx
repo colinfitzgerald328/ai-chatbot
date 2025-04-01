@@ -383,7 +383,7 @@ const ChatInterface: React.FC = () => {
               borderRightRadius={0}
               py={6}
               pl={4}
-              pr={input ? 12 : 4}
+              pr={12}
             />
             <IconButton
               aria-label="Send message"
@@ -398,6 +398,9 @@ const ChatInterface: React.FC = () => {
               top={0}
               height="100%"
               width="48px"
+              zIndex={2}
+              opacity={input.trim() ? 1 : 0.7}
+              _hover={{ opacity: 1 }}
             />
           </Flex>
           
